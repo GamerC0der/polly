@@ -1,0 +1,41 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'JetBrains Mono', monospace;
+  background: #0d1117;
+  color: #58a6ff;
+  min-height: 100vh;
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+.terminal {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.prompt { color: #7ee787; }
+.cmd { color: #d2a8ff; }
+.comment { color: #8b949e; }
+.string { color: #a5d6ff; }
+
+h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #79c0ff; }
+
+h2 {
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  color: #79c0ff;
+}
+
+h2.install { margin-top: 2rem; }
+
+pre { margin: 1rem 0; white-space: pre-wrap; }
+ul { margin: 1rem 0 1rem 1.5rem; }
+li { margin: 0.25rem 0; }
+
+.mt-1 { margin-top: 1rem; }
+.mt-half { margin-top: 0.5rem; }
+.mt-2 { margin-top: 2rem; }
+
+.blink { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }

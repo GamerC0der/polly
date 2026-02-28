@@ -7,31 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'JetBrains Mono', monospace;
-      background: #0d1117;
-      color: #58a6ff;
-      min-height: 100vh;
-      padding: 2rem;
-      line-height: 1.6;
-    }
-    .terminal {
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .prompt { color: #7ee787; }
-    .cmd { color: #d2a8ff; }
-    .comment { color: #8b949e; }
-    .string { color: #a5d6ff; }
-    h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #79c0ff; }
-    pre { margin: 1rem 0; white-space: pre-wrap; }
-    ul { margin: 1rem 0 1rem 1.5rem; }
-    li { margin: 0.25rem 0; }
-    .blink { animation: blink 1s step-end infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="terminal">
@@ -39,7 +15,7 @@
     <h1>Polly</h1>
     <p><span class="string">Polly</span> is a light-weight TypeScript based AI coding CLI built for Pollinations. Powered by Pollinations BYOP and built for the GPT 5.2 model, while supports other Pollinations models.</p>
     
-    <h2 style="font-size: 1rem; margin-top: 1.5rem; color: #79c0ff;">Features:</h2>
+    <h2>Features:</h2>
     <ul>
       <li>Terminal Use</li>
       <li>Model Selector</li>
@@ -47,15 +23,15 @@
       <li>Easy to Fork</li>
       <li>Web Support (use /web)</li>
     </ul>
-    <p style="margin-top: 1rem;">The only AI CLI built for Pollinations.</p>
+    <p class="mt-1">The only AI CLI built for Pollinations.</p>
 
-    <h2 style="font-size: 1rem; margin-top: 2rem; color: #79c0ff;">Install</h2>
+    <h2 class="install">Install</h2>
     <pre><span class="prompt">$</span> <span class="cmd">git clone</span> <span class="string">https://github.com/gamerc0der/polly</span>
 <span class="prompt">$</span> <span class="cmd">cd</span> polly/cli
 <span class="prompt">$</span> <span class="cmd">npm install -g .</span></pre>
-    <p class="comment" style="margin-top: 0.5rem;">Coming soon to an NPM near you.</p>
+    <p class="comment mt-half">Coming soon to an NPM near you.</p>
 
-    <pre style="margin-top: 2rem;"><span class="prompt">$</span> <span class="blink">_</span></pre>
+    <pre class="mt-2"><span class="prompt">$</span> <span class="blink">_</span></pre>
   </div>
 </body>
 </html>
