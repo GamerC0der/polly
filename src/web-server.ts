@@ -45,45 +45,46 @@ const HTML = `<!DOCTYPE html>
 <title>Polly</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.4;background:#0a0a0a;color:#eeeeee;min-height:100vh;display:flex;flex-direction:column}
+:root{--bg:#0a0a0a;--bg-panel:#141414;--bg-el:#1e1e1e;--border:#484848;--text:#eeeeee;--text-muted:#808080;--primary:#fab283;--secondary:#5c9cf5;--accent:#9d7cd8;--logo:#e5c07b;--warning:#f5a742;--overlay:rgba(10,10,10,0.95)}
+body{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:14px;line-height:1.4;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
 .app{display:flex;flex-direction:column;flex:1;min-height:0;padding:0 16px}
-.header{display:flex;justify-content:flex-end;gap:16px;padding:8px 8px 0 0;flex-shrink:0;color:#808080}
+.header{display:flex;justify-content:flex-end;gap:16px;padding:8px 8px 0 0;flex-shrink:0;color:var(--text-muted)}
 .main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 0}
 .main .prompt-wrap,.main .tips{width:100%;max-width:560px}
-.logo-box{background:#141414;border:1px solid #3c3c3c;padding:8px 24px;margin-bottom:16px}
-.logo-line{color:#e5c07b;font-weight:bold;white-space:pre}
+.logo-box{background:var(--bg-panel);border:1px solid var(--border);padding:8px 24px;margin-bottom:16px}
+.logo-line{color:var(--logo);font-weight:bold;white-space:pre}
 .prompt-wrap{position:relative;width:100%}
-.prompt-box{border:1px solid #484848;background:#1e1e1e;padding:8px 16px;width:100%}
-.prompt-box textarea{width:100%;min-height:24px;max-height:96px;background:transparent;border:none;color:#eeeeee;font:inherit;resize:none;outline:none}
-.prompt-box textarea::placeholder{color:#606060}
+.prompt-box{border:1px solid var(--border);background:var(--bg-el);padding:8px 16px;width:100%}
+.prompt-box textarea{width:100%;min-height:24px;max-height:96px;background:transparent;border:none;color:var(--text);font:inherit;resize:none;outline:none}
+.prompt-box textarea::placeholder{color:var(--text-muted)}
 .prompt-box textarea:disabled{opacity:0.7;cursor:not-allowed}
-.prompt-footer{display:flex;gap:16px;padding-top:8px;color:#9d7cd8;font-size:12px}
-.prompt-footer span:last-child{color:#808080}
-.ac-dropdown{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:#141414;border:1px solid #484848;max-height:96px;overflow:auto;z-index:100}
+.prompt-footer{display:flex;gap:16px;padding-top:8px;color:var(--accent);font-size:12px}
+.prompt-footer span:last-child{color:var(--text-muted)}
+.ac-dropdown{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--bg-panel);border:1px solid var(--border);max-height:96px;overflow:auto;z-index:100}
 .ac-item{padding:4px 8px;cursor:pointer}
-.ac-item.sel{background:#fab283;color:#0a0a0a}
-.tips{width:100%;margin-top:16px;display:flex;gap:4px;color:#f5a742}
-.tips .tip-muted{color:#808080}
+.ac-item.sel{background:var(--primary);color:var(--bg)}
+.tips{width:100%;margin-top:16px;display:flex;gap:4px;color:var(--warning)}
+.tips .tip-muted{color:var(--text-muted)}
 .session{flex:1;display:flex;flex-direction:column;min-height:0;padding:8px 16px}
-.session-header{display:flex;justify-content:flex-end;gap:16px;padding:8px 16px 0 0;color:#808080;flex-shrink:0}
+.session-header{display:flex;justify-content:flex-end;gap:16px;padding:8px 16px 0 0;color:var(--text-muted);flex-shrink:0}
 .messages{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
 .msg{display:flex;flex-direction:column;padding:4px 8px 8px}
-.msg-role{color:#fab283;font-weight:bold}
-.msg-role.polly{color:#5c9cf5}
-.msg-content{color:#eeeeee;white-space:pre-wrap;word-break:break-word}
-.msg-tool{padding-left:16px;padding:4px 0;color:#808080}
-.thinking{color:#808080;padding:4px 8px}
+.msg-role{color:var(--primary);font-weight:bold}
+.msg-role.polly{color:var(--secondary)}
+.msg-content{color:var(--text);white-space:pre-wrap;word-break:break-word}
+.msg-tool{padding-left:16px;padding:4px 0;color:var(--text-muted)}
+.thinking{color:var(--text-muted);padding:4px 8px}
 .prompt-area{padding:8px 0 8px;flex-shrink:0;width:100%}
 body.session-active .session .prompt-wrap{max-width:none}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,10,0.95);display:flex;align-items:center;justify-content:center;z-index:1000}
-.modal-box{background:#141414;border:1px solid #484848;padding:16px;max-width:400px;width:90%}
-.modal-title{color:#9d7cd8;font-weight:bold;margin-bottom:12px}
-.modal-text{color:#eeeeee;margin:8px 0}
-.modal-muted{color:#808080;margin-top:12px;font-size:12px}
-.modal-input{width:100%;background:#1e1e1e;border:1px solid #484848;color:#eeeeee;padding:8px;font:inherit;margin:8px 0}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--overlay);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal-box{background:var(--bg-panel);border:1px solid var(--border);padding:16px;max-width:400px;width:90%}
+.modal-title{color:var(--accent);font-weight:bold;margin-bottom:12px}
+.modal-text{color:var(--text);margin:8px 0}
+.modal-muted{color:var(--text-muted);margin-top:12px;font-size:12px}
+.modal-input{width:100%;background:var(--bg-el);border:1px solid var(--border);color:var(--text);padding:8px;font:inherit;margin:8px 0}
 .modal-list{max-height:120px;overflow:auto}
 .modal-item{padding:8px;cursor:pointer;border-radius:2px}
-.modal-item:hover,.modal-item.sel{background:#fab283;color:#0a0a0a}
+.modal-item:hover,.modal-item.sel{background:var(--primary);color:var(--bg)}
 .hidden{display:none}
 </style>
 </head>
@@ -130,6 +131,8 @@ body.session-active .session .prompt-wrap{max-width:none}
 var COMMANDS=["connect","clear","help","model","quit","theme","web"];
 var MODELS=["gpt-5.2","claude-4.5-haiku","glm-5","kimi-k2.5","custom"];
 var THEMES=["dark","warm","cool","minimal"];
+var THEME_COLORS={dark:{bg:"#0a0a0a",bgPanel:"#141414",bgEl:"#1e1e1e",border:"#484848",text:"#eeeeee",textMuted:"#808080",primary:"#fab283",secondary:"#5c9cf5",accent:"#9d7cd8",logo:"#e5c07b",warning:"#f5a742"},warm:{bg:"#282828",bgPanel:"#3c3836",bgEl:"#504945",border:"#665c54",text:"#ebdbb2",textMuted:"#928374",primary:"#83a598",secondary:"#d3869b",accent:"#8ec07c",logo:"#d79921",warning:"#fe8019"},cool:{bg:"#2E3440",bgPanel:"#3B4252",bgEl:"#434C5E",border:"#4C566A",text:"#ECEFF4",textMuted:"#8B95A7",primary:"#88C0D0",secondary:"#81A1C1",accent:"#8FBCBB",logo:"#EBCB8B",warning:"#D08770"},minimal:{bg:"#0d0d0d",bgPanel:"#1a1a1a",bgEl:"#262626",border:"#404040",text:"#e5e5e5",textMuted:"#737373",primary:"#d4d4d4",secondary:"#a3a3a3",accent:"#d4d4d4",logo:"#d4d4d4",warning:"#a3a3a3"}};
+function applyTheme(name){var t=THEME_COLORS[name]||THEME_COLORS.dark;var r=document.documentElement.style;r.setProperty("--bg",t.bg);r.setProperty("--bg-panel",t.bgPanel);r.setProperty("--bg-el",t.bgEl);r.setProperty("--border",t.border);r.setProperty("--text",t.text);r.setProperty("--text-muted",t.textMuted);r.setProperty("--primary",t.primary);r.setProperty("--secondary",t.secondary);r.setProperty("--accent",t.accent);r.setProperty("--logo",t.logo);r.setProperty("--warning",t.warning);var m=t.bg.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);r.setProperty("--overlay",m?"rgba("+parseInt(m[1],16)+","+parseInt(m[2],16)+","+parseInt(m[3],16)+",0.95)":"rgba(10,10,10,0.95)")}
 function filterCommands(q){q=q.toLowerCase().trim();return q?COMMANDS.filter(function(c){return c.startsWith(q)}):COMMANDS.slice()}
 function filterModels(q){q=q.toLowerCase().trim();return q?MODELS.filter(function(m){return m.toLowerCase().includes(q)}):MODELS.slice()}
 function filterThemes(q){q=q.toLowerCase().trim();return q?THEMES.filter(function(t){return t.startsWith(q)}):THEMES.slice()}
@@ -142,7 +145,7 @@ var ws=null;
 function connect(){var proto=location.protocol==="https:"?"wss:":"ws:";ws=new WebSocket(proto+"//"+location.host+"/ws");ws.onmessage=function(e){var s=JSON.parse(e.data);applyState(s)};ws.onclose=function(){setTimeout(connect,2000)};ws.onerror=function(){ws.close()}}
 var MODELS_OPTIONS=["gpt-5.2","claude-4.5-haiku","glm-5","kimi-k2.5","custom"];
 function sendAction(a,v){if(ws&&ws.readyState===1){ws.send(JSON.stringify({type:"action",action:a,value:v}))}}
-function applyState(s){document.querySelectorAll(".dir").forEach(function(e){e.textContent=s.dir});document.querySelectorAll(".config").forEach(function(e){e.textContent=s.hasConfig?"● configured":"● run /connect to configure"});document.getElementById("model").textContent=s.model;document.getElementById("session-model").textContent=s.model;document.getElementById("session-model-label").textContent=s.model;var ph=s.placeholder||(s.hasConfig?"Ask Anything... Prompt Me!":"Connect with Pollinations first (see /help)");input.placeholder=ph;sessionInput.placeholder=ph;input.disabled=s.inFlight;sessionInput.disabled=s.inFlight;var histForThinking=s.messages.filter(function(m){return m.role!=="system"});var lastMsg=histForThinking[histForThinking.length-1];var showThinking=s.inFlight&&(!lastMsg||(lastMsg.role==="assistant"&&!(lastMsg.content||"").trim()));thinking.classList.toggle("hidden",!showThinking);document.getElementById("help-modal").classList.toggle("hidden",!s.showHelpModal);document.getElementById("connect-modal").classList.toggle("hidden",!s.showConnectModal);document.getElementById("custom-modal").classList.toggle("hidden",!s.showCustomModelModal);if(!s.showCustomModelModal){document.getElementById("custom-model-input").value=""}else{document.getElementById("custom-model-input").focus()}document.getElementById("model-selector-modal").classList.toggle("hidden",!s.showModelSelectorModal);if(s.showConnectModal){var cm=document.getElementById("connect-msg");var cu=document.getElementById("connect-url");cm.textContent=s.connectStatus==="error"?s.connectErrorMsg||"Connection failed":"Auth URL copied to clipboard. Paste in browser, sign in, then return here.";cu.textContent=s.connectAuthUrl||""}if(s.showModelSelectorModal){var ml=document.getElementById("model-list");var selIdx=MODELS_OPTIONS.indexOf(s.model);if(selIdx<0)selIdx=0;ml.innerHTML="";MODELS_OPTIONS.forEach(function(m,i){var d=document.createElement("div");d.className="modal-item"+(i===selIdx?" sel":"");d.textContent=m+(m===s.model?" (current)":"");d.onclick=function(){sendAction("selectModel",m)};d.dataset.idx=i;ml.appendChild(d)});window._modelSelIdx=selIdx}var hist=s.messages.filter(function(m){return m.role!=="system"});messages.innerHTML="";hist.forEach(function(m){var d=document.createElement("div");d.className="msg";var r=document.createElement("div");r.className="msg-role "+(m.role==="user"?"":"polly");r.textContent=m.role==="user"?"you":"polly";d.appendChild(r);var c=document.createElement("div");c.className="msg-content";c.textContent=m.content;d.appendChild(c);(m.toolCalls||[]).forEach(function(tc){var t=document.createElement("div");t.className="msg-tool";var line1=document.createElement("div");line1.textContent="terminal: $ "+tc.cmd;t.appendChild(line1);var line2=document.createElement("div");line2.textContent=tc.status==="running"?"Generating...":tc.result||"";line2.className="msg-content";t.appendChild(line2);d.appendChild(t)});messages.appendChild(d)});messages.scrollTop=messages.scrollHeight;if(hist.length>0){home.classList.add("hidden");session.classList.remove("hidden");document.body.classList.add("session-active")}else{home.classList.remove("hidden");session.classList.add("hidden");document.body.classList.remove("session-active")}}
+function applyState(s){applyTheme(s.theme||"dark");document.querySelectorAll(".dir").forEach(function(e){e.textContent=s.dir});document.querySelectorAll(".config").forEach(function(e){e.textContent=s.hasConfig?"● configured":"● run /connect to configure"});document.getElementById("model").textContent=s.model;document.getElementById("session-model").textContent=s.model;document.getElementById("session-model-label").textContent=s.model;var ph=s.placeholder||(s.hasConfig?"Ask Anything... Prompt Me!":"Connect with Pollinations first (see /help)");input.placeholder=ph;sessionInput.placeholder=ph;input.disabled=s.inFlight;sessionInput.disabled=s.inFlight;var histForThinking=s.messages.filter(function(m){return m.role!=="system"});var lastMsg=histForThinking[histForThinking.length-1];var showThinking=s.inFlight&&(!lastMsg||(lastMsg.role==="assistant"&&!(lastMsg.content||"").trim()));thinking.classList.toggle("hidden",!showThinking);document.getElementById("help-modal").classList.toggle("hidden",!s.showHelpModal);document.getElementById("connect-modal").classList.toggle("hidden",!s.showConnectModal);document.getElementById("custom-modal").classList.toggle("hidden",!s.showCustomModelModal);if(!s.showCustomModelModal){document.getElementById("custom-model-input").value=""}else{document.getElementById("custom-model-input").focus()}document.getElementById("model-selector-modal").classList.toggle("hidden",!s.showModelSelectorModal);if(s.showConnectModal){var cm=document.getElementById("connect-msg");var cu=document.getElementById("connect-url");cm.textContent=s.connectStatus==="error"?s.connectErrorMsg||"Connection failed":"Auth URL copied to clipboard. Paste in browser, sign in, then return here.";cu.textContent=s.connectAuthUrl||""}if(s.showModelSelectorModal){var ml=document.getElementById("model-list");var selIdx=MODELS_OPTIONS.indexOf(s.model);if(selIdx<0)selIdx=0;ml.innerHTML="";MODELS_OPTIONS.forEach(function(m,i){var d=document.createElement("div");d.className="modal-item"+(i===selIdx?" sel":"");d.textContent=m+(m===s.model?" (current)":"");d.onclick=function(){sendAction("selectModel",m)};d.dataset.idx=i;ml.appendChild(d)});window._modelSelIdx=selIdx}var hist=s.messages.filter(function(m){return m.role!=="system"});messages.innerHTML="";hist.forEach(function(m){var d=document.createElement("div");d.className="msg";var r=document.createElement("div");r.className="msg-role "+(m.role==="user"?"":"polly");r.textContent=m.role==="user"?"you":"polly";d.appendChild(r);var c=document.createElement("div");c.className="msg-content";c.textContent=m.content;d.appendChild(c);(m.toolCalls||[]).forEach(function(tc){var t=document.createElement("div");t.className="msg-tool";var line1=document.createElement("div");line1.textContent="terminal: $ "+tc.cmd;t.appendChild(line1);var line2=document.createElement("div");line2.textContent=tc.status==="running"?"Generating...":tc.result||"";line2.className="msg-content";t.appendChild(line2);d.appendChild(t)});messages.appendChild(d)});messages.scrollTop=messages.scrollHeight;if(hist.length>0){home.classList.add("hidden");session.classList.remove("hidden");document.body.classList.add("session-active")}else{home.classList.remove("hidden");session.classList.add("hidden");document.body.classList.remove("session-active")}}
 function sendSubmit(text){if(!text.trim())return;if(ws&&ws.readyState===1){ws.send(JSON.stringify({type:"submit",text:text.trim()}))}}
 function setupAc(inp,acContainer){var acSel=0;function update(){var val=inp.value;var ac=getAc(val);if(!ac||!ac.matches.length){acContainer.classList.add("hidden");tipsEl.classList.remove("hidden");return}acSel=0;tipsEl.classList.add("hidden");renderAc(ac,0,acContainer)}
 inp.oninput=function(){update();inp.style.height="auto";inp.style.height=Math.min(inp.scrollHeight,96)+"px"};
