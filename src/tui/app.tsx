@@ -4,6 +4,7 @@ import { ThemeProvider, useTheme } from "./context/theme"
 import { HelpModal } from "./component/help-modal"
 import { ConnectModal } from "./component/connect-modal"
 import { CustomModelModal } from "./component/custom-model-modal"
+import { ModelSelectorModal } from "./component/model-selector-modal"
 import { Home } from "./routes/home"
 import { Session, type Message } from "./routes/session"
 import { chatOnce } from "../api"
@@ -51,11 +52,13 @@ function AppInner(props: { mode: "dark" | "light" }) {
   const [showCustomModelModal, setShowCustomModelModal] = createSignal(false)
   const [inFlight, setInFlight] = createSignal(false)
   const [showHelpModal, setShowHelpModal] = createSignal(false)
+  const [showModelSelectorModal, setShowModelSelectorModal] = createSignal(false)
 
   useKeyboard((e) => {
     if (e.name === "escape" && showHelpModal()) setShowHelpModal(false)
     if (e.name === "escape" && showConnectModal()) setShowConnectModal(false)
     if (e.name === "escape" && showCustomModelModal()) setShowCustomModelModal(false)
+    if (e.name === "escape" && showModelSelectorModal()) setShowModelSelectorModal(false)
   })
 
   const directory = process.cwd()
@@ -132,8 +135,7 @@ function AppInner(props: { mode: "dark" | "light" }) {
           }
         }
       } else {
-        const list = AVAILABLE_MODELS.map((m) => (m === model() ? `  ${m} (current)` : `  ${m}`)).join("\n")
-        setMessages((m) => [...m, { role: "system", content: `Models:\n${list}\nUse /model <name> to switch.` }])
+        setShowModelSelectorModal(true)
       }
       return
     }
@@ -294,6 +296,29 @@ function AppInner(props: { mode: "dark" | "light" }) {
         onSetModel={(m) => {
           setShowCustomModelModal(false)
           if (hasConfig(config())) {
+            setModel(m)
+            setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${m}.` }])
+          } else {
+            setPendingCustomModel(m)
+            setShowConnectModal(true)
+          }
+        }}
+      />
+      <ModelSelectorModal
+        visible={showModelSelectorModal()}
+        currentModel={model()}
+        onClose={() => setShowModelSelectorModal(false)}
+        onSelectModel={(m) => {
+          setShowModelSelectorModal(false)
+          if (m === "custom") {
+            setShowCustomModelModal(true)
+            return
+          }
+          const preset = PRESET_MODELS.find((p) => p.toLowerCase() === m.toLowerCase())
+          if (preset) {
+            setModel(preset)
+            setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${preset}.` }])
+          } else if (hasConfig(config())) {
             setModel(m)
             setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${m}.` }])
           } else {
