@@ -1,0 +1,31 @@
+{
+  "name": "polly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Polly - a custom TypeScript AI CLI with configurable OpenAI-compatible endpoints.",
+  "type": "module",
+  "bin": {
+    "polly": "bin/polly"
+  },
+  "scripts": {
+    "dev": "bun run src/index.tsx",
+    "build": "bun build src/index.tsx --outdir=dist --target=bun",
+    "start": "bun run src/index.tsx",
+    "make": "npm install -g ."
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@opentui/core": "0.1.81",
+    "@opentui/solid": "0.1.81",
+    "figlet": "^1.10.0",
+    "solid-js": "^1.9.10"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "bun-types": "latest",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

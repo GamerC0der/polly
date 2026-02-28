@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+  SCRIPT="$(readlink "$SCRIPT")"
+  [[ "$SCRIPT" != /* ]] && SCRIPT="$(dirname "$0")/$SCRIPT"
+done
+ROOT="$(cd "$(dirname "$SCRIPT")/.." && pwd)"
+BUN="${HOME}/.bun/bin/bun"
+[ -x "$BUN" ] || BUN="$(command -v bun 2>/dev/null)"
+[ -n "$BUN" ] || { echo "polly: bun not found. Install from https://bun.sh" >&2; exit 1; }
+cd "$ROOT" && exec "$BUN" run src/index.tsx "$@"

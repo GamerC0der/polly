@@ -1,0 +1,13 @@
+export const EmptyBorder = {
+  topLeft: "",
+  bottomLeft: "",
+  vertical: "",
+  topRight: "",
+  bottomRight: "",
+  horizontal: " ",
+  bottomT: "",
+  topT: "",
+  cross: "",
+  leftT: "",
+  rightT: "",
+}
