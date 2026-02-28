@@ -47,6 +47,9 @@ export function HelpModal(props: { visible: boolean; onClose: () => void }) {
           <text fg={theme.text}>
             Use /theme &lt;dark|warm|cool|minimal&gt; to switch themes.
           </text>
+          <text fg={theme.text}>
+            Use /web to open a web UI clone at http://127.0.0.1:35066/
+          </text>
           <box paddingTop={1}>
             <text fg={theme.textMuted}>Press Escape to close</text>
           </box>

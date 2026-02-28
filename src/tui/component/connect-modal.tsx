@@ -1,16 +1,20 @@
-import { createSignal, onMount, Show } from "solid-js"
+import { createSignal, createEffect, onMount, Show } from "solid-js"
 import { useTheme } from "../context/theme"
 import { connectWithPollinations } from "../../pollinations-auth"
 
 export function ConnectModal(props: {
   onClose: () => void
   onConnected: (key: string) => void | Promise<void>
+  onStateChange?: (s: { authUrl: string; status: "connecting" | "error"; errorMsg: string }) => void
 }) {
   const { theme } = useTheme()
   const [status, setStatus] = createSignal<"connecting" | "error">("connecting")
   const [errorMsg, setErrorMsg] = createSignal("")
   const [authUrl, setAuthUrl] = createSignal("")
 
+  createEffect(() => {
+    props.onStateChange?.({ authUrl: authUrl(), status: status(), errorMsg: errorMsg() })
+  })
   onMount(() => {
     setStatus("connecting")
     connectWithPollinations((url) => setAuthUrl(url))

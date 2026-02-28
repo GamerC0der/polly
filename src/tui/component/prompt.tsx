@@ -2,7 +2,7 @@ import { createSignal, createMemo, createEffect, For, Show } from "solid-js"
 import { useTheme, THEME_NAMES } from "../context/theme"
 import { filterModels } from "../models"
 
-const SLASH_COMMANDS = ["connect", "clear", "help", "model", "quit", "theme"] as const
+const SLASH_COMMANDS = ["connect", "clear", "help", "model", "quit", "theme", "web"] as const
 
 function filterCommands(query: string): string[] {
   const q = query.toLowerCase().trim()

@@ -1,5 +1,5 @@
 import { useTerminalDimensions, useRenderer, useKeyboard } from "@opentui/solid"
-import { Switch, Match, createSignal, onMount } from "solid-js"
+import { Switch, Match, createSignal, createEffect, onMount } from "solid-js"
 import { ThemeProvider, useTheme, THEME_NAMES, type ThemeName } from "./context/theme"
 import { HelpModal } from "./component/help-modal"
 import { ConnectModal } from "./component/connect-modal"
@@ -9,6 +9,7 @@ import { Home } from "./routes/home"
 import { Session, type Message } from "./routes/session"
 import { chatOnce } from "../api"
 import { loadConfig, saveConfig, clearConfig, hasConfig, BASE_URL } from "../config"
+import { startWebServer, getWebUrl, broadcastState } from "../web-server"
 import { getTool, listTools } from "../tools"
 import type { SurfConfig } from "../types"
 
@@ -53,6 +54,9 @@ function AppInner(props: { mode: "dark" | "light" }) {
   const [inFlight, setInFlight] = createSignal(false)
   const [showHelpModal, setShowHelpModal] = createSignal(false)
   const [showModelSelectorModal, setShowModelSelectorModal] = createSignal(false)
+  const [connectAuthUrl, setConnectAuthUrl] = createSignal("")
+  const [connectStatus, setConnectStatus] = createSignal<"connecting" | "error">("connecting")
+  const [connectErrorMsg, setConnectErrorMsg] = createSignal("")
 
   useKeyboard((e) => {
     if (e.name === "escape" && showHelpModal()) setShowHelpModal(false)
@@ -75,6 +79,41 @@ function AppInner(props: { mode: "dark" | "light" }) {
       setShowConnectModal(true)
     }
     setMessages([{ role: "system", content: systemPrompt }, { role: "system", content: "Tip: /help for commands." }])
+  })
+
+  createEffect(() => {
+    const _ = [
+      messages(),
+      model(),
+      config(),
+      inFlight(),
+      showHelpModal(),
+      showConnectModal(),
+      showCustomModelModal(),
+      showModelSelectorModal(),
+      connectAuthUrl(),
+      connectStatus(),
+      connectErrorMsg(),
+      selected,
+    ]
+    broadcastState({
+      messages: messages(),
+      model: model(),
+      dir: process.cwd(),
+      hasConfig: hasConfig(config()),
+      inFlight: inFlight(),
+      placeholder: !hasConfig(config())
+        ? "Connect with Pollinations first (see /help)"
+        : undefined,
+      showHelpModal: showHelpModal(),
+      showConnectModal: showConnectModal(),
+      showCustomModelModal: showCustomModelModal(),
+      showModelSelectorModal: showModelSelectorModal(),
+      connectAuthUrl: showConnectModal() ? connectAuthUrl() : undefined,
+      connectStatus: showConnectModal() ? connectStatus() : undefined,
+      connectErrorMsg: showConnectModal() ? connectErrorMsg() : undefined,
+      theme: selected,
+    })
   })
 
   const handleSubmit = async (text: string) => {
@@ -101,6 +140,75 @@ function AppInner(props: { mode: "dark" | "light" }) {
 
     if (lower === "/quit" || lower === "/exit") {
       process.exit(0)
+    }
+
+    if (lower === "/web") {
+      const started = startWebServer({
+        getStatus: () => ({ dir: process.cwd(), hasConfig: hasConfig(config()) }),
+        onWebAction: (action, value) => {
+          if (action === "closeModal") {
+            setShowHelpModal(false)
+            setShowConnectModal(false)
+            setShowCustomModelModal(false)
+            setShowModelSelectorModal(false)
+          } else if (action === "setCustomModel" && value) {
+            setShowCustomModelModal(false)
+            if (hasConfig(config())) {
+              setModel(value)
+              setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${value}.` }])
+            } else {
+              setPendingCustomModel(value)
+              setShowConnectModal(true)
+            }
+          } else if (action === "selectModel" && value) {
+            setShowModelSelectorModal(false)
+            if (value === "custom") {
+              setShowCustomModelModal(true)
+            } else {
+              const preset = PRESET_MODELS.find((p) => p.toLowerCase() === value.toLowerCase())
+              if (preset) {
+                setModel(preset)
+                setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${preset}.` }])
+              } else if (hasConfig(config())) {
+                setModel(value)
+                setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${value}.` }])
+              } else {
+                setPendingCustomModel(value)
+                setShowConnectModal(true)
+              }
+            }
+          }
+        },
+        getState: () => ({
+          messages: messages(),
+          model: model(),
+          dir: process.cwd(),
+          hasConfig: hasConfig(config()),
+          inFlight: inFlight(),
+          placeholder: !hasConfig(config())
+            ? "Connect with Pollinations first (see /help)"
+            : undefined,
+          showHelpModal: showHelpModal(),
+          showConnectModal: showConnectModal(),
+          showCustomModelModal: showCustomModelModal(),
+          showModelSelectorModal: showModelSelectorModal(),
+          connectAuthUrl: showConnectModal() ? connectAuthUrl() : undefined,
+          connectStatus: showConnectModal() ? connectStatus() : undefined,
+          connectErrorMsg: showConnectModal() ? connectErrorMsg() : undefined,
+          theme: selected,
+        }),
+        onSubmit: handleSubmit,
+      })
+      setMessages((m) => [
+        ...m,
+        {
+          role: "system",
+          content: started
+            ? `Web UI running at ${getWebUrl()} — open in browser`
+            : `Web UI already running at ${getWebUrl()}`,
+        },
+      ])
+      return
     }
 
     if (lower.startsWith("/tool list")) {
@@ -289,6 +397,11 @@ function AppInner(props: { mode: "dark" | "light" }) {
           onClose={() => {
             setShowConnectModal(false)
             setPendingCustomModel(null)
+          }}
+          onStateChange={(s) => {
+            setConnectAuthUrl(s.authUrl)
+            setConnectStatus(s.status)
+            setConnectErrorMsg(s.errorMsg)
           }}
           onConnected={async (key) => {
             const newConfig = { ...config(), apiKey: key, baseUrl: BASE_URL }
