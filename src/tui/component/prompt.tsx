@@ -1,6 +1,14 @@
 import { createSignal, createMemo, createEffect, For, Show } from "solid-js"
 import { useTheme } from "../context/theme"
-import { AVAILABLE_MODELS, filterModels } from "../models"
+import { filterModels } from "../models"
+
+const SLASH_COMMANDS = ["connect", "clear", "model", "quit"] as const
+
+function filterCommands(query: string): string[] {
+  const q = query.toLowerCase().trim()
+  if (!q) return [...SLASH_COMMANDS]
+  return SLASH_COMMANDS.filter((c) => c.startsWith(q))
+}
 
 export type PromptRef = {
   focus(): void
@@ -38,11 +46,22 @@ export function Prompt(props: {
     if (!match) return null
     const query = match[1]
     const matches = filterModels(query)
-    return { query, matches }
+    return { query, matches, type: "model" as const }
   })
 
-  const acVisible = () => modelAc() !== null
-  const acMatches = () => modelAc()?.matches ?? []
+  const commandAc = createMemo(() => {
+    const val = inputValue()
+    if (modelAc()) return null
+    const match = val.match(/^\/(\S*)$/)
+    if (!match) return null
+    const query = match[1]
+    const matches = filterCommands(query)
+    return { query, matches, type: "command" as const }
+  })
+
+  const activeAc = () => modelAc() ?? commandAc()
+  const acVisible = () => activeAc() !== null
+  const acMatches = () => activeAc()?.matches ?? []
   const acShowing = () => acVisible() && acMatches().length > 0
 
   createEffect(() => props.onAcVisibleChange?.(acShowing()))
@@ -124,15 +143,20 @@ export function Prompt(props: {
           onKeyDown={(e) => {
             if (!acShowing()) return
             const complete = () => {
+              const ac = activeAc()
               const matches = acMatches()
               const sel = acSelected()
-              if (matches[sel] !== undefined && inputRef) {
-                const val = inputRef.plainText
-                const before = val.replace(/\/model\s+.*$/i, `/model ${matches[sel]} `)
-                inputRef.setText(before)
-                setInputValue(before)
-                setAcSelected(0)
+              if (matches[sel] === undefined || !inputRef || !ac) return
+              const val = inputRef.plainText
+              let before: string
+              if (ac.type === "model") {
+                before = val.replace(/\/model\s+.*$/i, `/model ${matches[sel]} `)
+              } else {
+                before = val.replace(/^\/(\S*)$/, `/${matches[sel]} `)
               }
+              inputRef.setText(before)
+              setInputValue(before)
+              setAcSelected(0)
             }
             if (e.name === "tab") {
               e.preventDefault()
