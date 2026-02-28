@@ -7,5 +7,6 @@ Features:
 - Model Selector
 - BYOP
 - Easy to Fork
+- Web Support (use /web)
 
 The only AI CLI built for Pollinations.
