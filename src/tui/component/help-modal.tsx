@@ -44,6 +44,9 @@ export function HelpModal(props: { visible: boolean; onClose: () => void }) {
           <text fg={theme.text}>
             Use /connect to connect with Pollinations (BYOP). /logout to disconnect.
           </text>
+          <text fg={theme.text}>
+            Use /theme &lt;dark|warm|cool|minimal&gt; to switch themes.
+          </text>
           <box paddingTop={1}>
             <text fg={theme.textMuted}>Press Escape to close</text>
           </box>

@@ -1,13 +1,19 @@
 import { createSignal, createMemo, createEffect, For, Show } from "solid-js"
-import { useTheme } from "../context/theme"
+import { useTheme, THEME_NAMES } from "../context/theme"
 import { filterModels } from "../models"
 
-const SLASH_COMMANDS = ["connect", "clear", "model", "quit"] as const
+const SLASH_COMMANDS = ["connect", "clear", "help", "model", "quit", "theme"] as const
 
 function filterCommands(query: string): string[] {
   const q = query.toLowerCase().trim()
   if (!q) return [...SLASH_COMMANDS]
   return SLASH_COMMANDS.filter((c) => c.startsWith(q))
+}
+
+function filterThemes(query: string): string[] {
+  const q = query.toLowerCase().trim()
+  if (!q) return [...THEME_NAMES]
+  return THEME_NAMES.filter((t) => t.startsWith(q))
 }
 
 export type PromptRef = {
@@ -49,9 +55,18 @@ export function Prompt(props: {
     return { query, matches, type: "model" as const }
   })
 
+  const themeAc = createMemo(() => {
+    const val = inputValue()
+    const match = val.match(/^\/theme\s+(.*)$/i)
+    if (!match) return null
+    const query = match[1]
+    const matches = filterThemes(query)
+    return { query, matches, type: "theme" as const }
+  })
+
   const commandAc = createMemo(() => {
     const val = inputValue()
-    if (modelAc()) return null
+    if (modelAc() || themeAc()) return null
     const match = val.match(/^\/(\S*)$/)
     if (!match) return null
     const query = match[1]
@@ -59,7 +74,7 @@ export function Prompt(props: {
     return { query, matches, type: "command" as const }
   })
 
-  const activeAc = () => modelAc() ?? commandAc()
+  const activeAc = () => modelAc() ?? themeAc() ?? commandAc()
   const acVisible = () => activeAc() !== null
   const acMatches = () => activeAc()?.matches ?? []
   const acShowing = () => acVisible() && acMatches().length > 0
@@ -151,6 +166,8 @@ export function Prompt(props: {
               let before: string
               if (ac.type === "model") {
                 before = val.replace(/\/model\s+.*$/i, `/model ${matches[sel]} `)
+              } else if (ac.type === "theme") {
+                before = val.replace(/\/theme\s+.*$/i, `/theme ${matches[sel]} `)
               } else {
                 before = val.replace(/^\/(\S*)$/, `/${matches[sel]} `)
               }

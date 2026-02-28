@@ -1,6 +1,6 @@
 import { useTerminalDimensions, useRenderer, useKeyboard } from "@opentui/solid"
 import { Switch, Match, createSignal, onMount } from "solid-js"
-import { ThemeProvider, useTheme } from "./context/theme"
+import { ThemeProvider, useTheme, THEME_NAMES, type ThemeName } from "./context/theme"
 import { HelpModal } from "./component/help-modal"
 import { ConnectModal } from "./component/connect-modal"
 import { CustomModelModal } from "./component/custom-model-modal"
@@ -43,7 +43,7 @@ export function App(props: { mode: "dark" | "light" }) {
 function AppInner(props: { mode: "dark" | "light" }) {
   const dimensions = useTerminalDimensions()
   const renderer = useRenderer()
-  const { theme } = useTheme()
+  const { theme, selected, set, themes } = useTheme()
   const [config, setConfig] = createSignal<SurfConfig>({ apiKey: "", baseUrl: BASE_URL })
   const [messages, setMessages] = createSignal<Message[]>([])
   const [model, setModel] = createSignal(DEFAULT_MODEL)
@@ -111,6 +111,20 @@ function AppInner(props: { mode: "dark" | "light" }) {
 
     if (lower === "/clear") {
       setMessages([{ role: "system", content: systemPrompt }])
+      return
+    }
+
+    if (lower.startsWith("/theme")) {
+      const arg = text.trim().split(/\s+/)[1]?.toLowerCase()
+      if (arg && THEME_NAMES.includes(arg as ThemeName)) {
+        set(arg as ThemeName)
+        setMessages((m) => [...m, { role: "system", content: `Theme set to ${arg}.` }])
+      } else {
+        setMessages((m) => [
+          ...m,
+          { role: "system", content: `Theme: ${selected}. Use /theme <name> to switch. Options: ${themes.join(", ")}` },
+        ])
+      }
       return
     }
 

@@ -1,7 +1,21 @@
 import { RGBA } from "@opentui/core"
-import { createMemo } from "solid-js"
+import { createMemo, createSignal, onMount } from "solid-js"
 import { createSimpleContext } from "./helper"
-import polly from "../theme/polly.json" with { type: "json" }
+import dark from "../theme/dark.json" with { type: "json" }
+import warm from "../theme/warm.json" with { type: "json" }
+import cool from "../theme/cool.json" with { type: "json" }
+import minimal from "../theme/minimal.json" with { type: "json" }
+import { loadConfig, saveConfig } from "../../config"
+
+const THEMES: Record<string, ThemeJson> = {
+  dark: dark as ThemeJson,
+  warm: warm as ThemeJson,
+  cool: cool as ThemeJson,
+  minimal: minimal as ThemeJson,
+}
+
+export const THEME_NAMES = ["dark", "warm", "cool", "minimal"] as const
+export type ThemeName = (typeof THEME_NAMES)[number]
 
 type HexColor = `#${string}`
 type RefName = string
@@ -54,13 +68,33 @@ function resolveTheme(theme: ThemeJson, mode: "dark" | "light") {
 export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
   name: "Theme",
   init: (props: { mode: "dark" | "light" }) => {
-    const values = createMemo(() => resolveTheme(polly as ThemeJson, props.mode))
+    const [active, setActive] = createSignal<ThemeName>("minimal")
+
+    onMount(async () => {
+      const cfg = await loadConfig()
+      if (cfg.theme && THEME_NAMES.includes(cfg.theme as ThemeName)) {
+        setActive(cfg.theme as ThemeName)
+      }
+    })
+
+    const values = createMemo(() =>
+      resolveTheme(THEMES[active()] ?? THEMES.minimal, props.mode),
+    )
+
     return {
       theme: new Proxy(values(), {
         get(_target, prop) {
           return values()[prop as keyof ThemeColors]
         },
       }),
+      get selected() {
+        return active()
+      },
+      themes: THEME_NAMES,
+      set(theme: ThemeName) {
+        setActive(theme)
+        loadConfig().then((cfg) => saveConfig({ ...cfg, theme }))
+      },
     }
   },
 })

@@ -8,4 +8,5 @@ export interface ChatMessage {
 export interface SurfConfig {
   apiKey: string;
   baseUrl: string;
+  theme?: string;
 }

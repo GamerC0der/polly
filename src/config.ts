@@ -17,6 +17,7 @@ export async function loadConfig(): Promise<SurfConfig> {
     return {
       apiKey: typeof parsed.apiKey === "string" ? parsed.apiKey : "",
       baseUrl: BASE_URL,
+      theme: typeof parsed.theme === "string" ? parsed.theme : undefined,
     };
   } catch {
     return { apiKey: "", baseUrl: BASE_URL };
@@ -31,6 +32,7 @@ export async function saveConfig(config: SurfConfig): Promise<void> {
   const payload = {
     apiKey: config.apiKey,
     baseUrl: BASE_URL,
+    theme: config.theme,
     updatedAt: new Date().toISOString(),
     signature: hashed,
   };
