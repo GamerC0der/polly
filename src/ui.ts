@@ -33,6 +33,7 @@ export function renderHelp(model: string): void {
   console.log(`/model <name> set model (current: ${model})`);
   console.log("/setkey change API key");
   console.log("/setbase change OpenAI Base URL");
+  console.log("/logout disconnect and clear API key");
   console.log("/clear clear conversation");
   console.log("/quit exit");
   printDivider();

@@ -37,6 +37,10 @@ export async function saveConfig(config: SurfConfig): Promise<void> {
   await writeFile(CONFIG_PATH, JSON.stringify(payload, null, 2), "utf8");
 }
 
+export async function clearConfig(): Promise<void> {
+  await saveConfig({ apiKey: "", baseUrl: BASE_URL });
+}
+
 export function hasConfig(config: Partial<SurfConfig>): config is SurfConfig {
   return !!config.apiKey?.trim();
 }

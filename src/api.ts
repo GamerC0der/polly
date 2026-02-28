@@ -2,7 +2,7 @@ import { buildChatEndpoint, MODEL_TO_POLLINATIONS } from "./config";
 import type { ChatMessage, SurfConfig } from "./types";
 
 function toPollinationsModel(display: string): string {
-  return MODEL_TO_POLLINATIONS[display] ?? "openai-large";
+  return MODEL_TO_POLLINATIONS[display] ?? display;
 }
 
 async function* streamResponse(

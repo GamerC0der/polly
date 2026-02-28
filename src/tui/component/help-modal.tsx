@@ -33,7 +33,7 @@ export function HelpModal(props: { visible: boolean; onClose: () => void }) {
             Help
           </text>
           <text fg={theme.text}>
-            Use /model to switch models — type /model and Tab to autocomplete.
+            Use /model to switch models — type /model and Tab to autocomplete. Use /model custom for any model from enter.pollinations.ai
           </text>
           <text fg={theme.text}>
             Run the polly cli in a folder in order to code in that folder.
@@ -42,7 +42,7 @@ export function HelpModal(props: { visible: boolean; onClose: () => void }) {
             The AI can run terminal commands: create files, folders, view content, line counts, etc.
           </text>
           <text fg={theme.text}>
-            Use /connect to connect with Pollinations (BYOP).
+            Use /connect to connect with Pollinations (BYOP). /logout to disconnect.
           </text>
           <box paddingTop={1}>
             <text fg={theme.textMuted}>Press Escape to close</text>

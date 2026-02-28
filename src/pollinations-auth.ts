@@ -2,7 +2,6 @@ import { createServer } from "node:http";
 import { platform } from "node:os";
 
 const AUTH_URL = "https://enter.pollinations.ai/authorize";
-const MODELS = "openai-large,claude-fast,glm,kimi";
 const PERMISSIONS = "profile,balance";
 
 function copyToClipboard(text: string): void {
@@ -46,7 +45,7 @@ export function connectWithPollinations(onUrlReady?: (url: string) => void): Pro
   return new Promise((resolve, reject) => {
     const port = 34567 + Math.floor(Math.random() * 1000);
     const redirectUrl = `http://127.0.0.1:${port}`;
-    const authLink = `${AUTH_URL}?redirect_url=${encodeURIComponent(redirectUrl)}&permissions=${PERMISSIONS}&models=${encodeURIComponent(MODELS)}`;
+    const authLink = `${AUTH_URL}?redirect_url=${encodeURIComponent(redirectUrl)}&permissions=${PERMISSIONS}`;
 
     onUrlReady?.(authLink);
     copyToClipboard(authLink);

@@ -3,15 +3,17 @@ import { Switch, Match, createSignal, onMount } from "solid-js"
 import { ThemeProvider, useTheme } from "./context/theme"
 import { HelpModal } from "./component/help-modal"
 import { ConnectModal } from "./component/connect-modal"
+import { CustomModelModal } from "./component/custom-model-modal"
 import { Home } from "./routes/home"
 import { Session, type Message } from "./routes/session"
 import { chatOnce } from "../api"
-import { loadConfig, saveConfig, hasConfig, BASE_URL } from "../config"
+import { loadConfig, saveConfig, clearConfig, hasConfig, BASE_URL } from "../config"
 import { getTool, listTools } from "../tools"
 import type { SurfConfig } from "../types"
 
-const DEFAULT_MODEL = "gpt-5.2"
-const AVAILABLE_MODELS = ["gpt-5.2", "claude-4.5-haiku", "glm-5", "kimi-k2.5"] as const
+import { AVAILABLE_MODELS, DEFAULT_MODEL } from "./models"
+
+const PRESET_MODELS = ["gpt-5.2", "claude-4.5-haiku", "glm-5", "kimi-k2.5"] as const
 const MAX_CONTEXT = 24
 
 const systemPrompt = `
@@ -45,12 +47,15 @@ function AppInner(props: { mode: "dark" | "light" }) {
   const [messages, setMessages] = createSignal<Message[]>([])
   const [model, setModel] = createSignal(DEFAULT_MODEL)
   const [showConnectModal, setShowConnectModal] = createSignal(false)
+  const [pendingCustomModel, setPendingCustomModel] = createSignal<string | null>(null)
+  const [showCustomModelModal, setShowCustomModelModal] = createSignal(false)
   const [inFlight, setInFlight] = createSignal(false)
   const [showHelpModal, setShowHelpModal] = createSignal(false)
 
   useKeyboard((e) => {
     if (e.name === "escape" && showHelpModal()) setShowHelpModal(false)
     if (e.name === "escape" && showConnectModal()) setShowConnectModal(false)
+    if (e.name === "escape" && showCustomModelModal()) setShowCustomModelModal(false)
   })
 
   const directory = process.cwd()
@@ -83,6 +88,14 @@ function AppInner(props: { mode: "dark" | "light" }) {
       return
     }
 
+    if (lower === "/logout") {
+      await clearConfig()
+      setConfig({ apiKey: "", baseUrl: BASE_URL })
+      setShowConnectModal(true)
+      setMessages((m) => [...m, { role: "system", content: "Logged out. Connect again to continue." }])
+      return
+    }
+
     if (lower === "/quit" || lower === "/exit") {
       process.exit(0)
     }
@@ -100,20 +113,23 @@ function AppInner(props: { mode: "dark" | "light" }) {
 
     if (lower.startsWith("/model")) {
       const parts = text.trim().split(/\s+/)
-      const arg = parts[1]?.toLowerCase()
+      const arg = parts[1]
+      const argLower = arg?.toLowerCase()
       if (arg) {
-        const valid = AVAILABLE_MODELS.find((m) => m.toLowerCase() === arg)
-        if (valid) {
-          setModel(valid)
-          setMessages((m) => [...m, { role: "system", content: `Model set to ${valid}.` }])
+        if (argLower === "custom") {
+          setShowCustomModelModal(true)
         } else {
-          setMessages((m) => [
-            ...m,
-            {
-              role: "system",
-              content: `Unknown model: ${parts[1]}. Available: ${AVAILABLE_MODELS.join(", ")}`,
-            },
-          ])
+          const preset = PRESET_MODELS.find((m) => m.toLowerCase() === argLower)
+          if (preset) {
+            setModel(preset)
+            setMessages((m) => [...m, { role: "system", content: `Model set to ${preset}.` }])
+          } else if (hasConfig(cfg)) {
+            setModel(arg)
+            setMessages((m) => [...m, { role: "system", content: `Model set to ${arg}.` }])
+          } else {
+            setPendingCustomModel(arg)
+            setShowConnectModal(true)
+          }
         }
       } else {
         const list = AVAILABLE_MODELS.map((m) => (m === model() ? `  ${m} (current)` : `  ${m}`)).join("\n")
@@ -254,15 +270,38 @@ function AppInner(props: { mode: "dark" | "light" }) {
       <HelpModal visible={showHelpModal()} onClose={() => setShowHelpModal(false)} />
       {showConnectModal() && (
         <ConnectModal
-          onClose={() => setShowConnectModal(false)}
+          onClose={() => {
+            setShowConnectModal(false)
+            setPendingCustomModel(null)
+          }}
           onConnected={async (key) => {
             const newConfig = { ...config(), apiKey: key, baseUrl: BASE_URL }
             setConfig(newConfig)
             await saveConfig(newConfig)
+            const pending = pendingCustomModel()
+            if (pending) {
+              setModel(pending)
+              setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${pending}.` }])
+              setPendingCustomModel(null)
+            }
             setShowConnectModal(false)
           }}
         />
       )}
+      <CustomModelModal
+        visible={showCustomModelModal()}
+        onClose={() => setShowCustomModelModal(false)}
+        onSetModel={(m) => {
+          setShowCustomModelModal(false)
+          if (hasConfig(config())) {
+            setModel(m)
+            setMessages((msgs) => [...msgs, { role: "system", content: `Model set to ${m}.` }])
+          } else {
+            setPendingCustomModel(m)
+            setShowConnectModal(true)
+          }
+        }}
+      />
     </box>
   )
 }
