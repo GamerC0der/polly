@@ -33,6 +33,11 @@ pre { margin: 1rem 0; white-space: pre-wrap; }
 ul { margin: 1rem 0 1rem 1.5rem; }
 li { margin: 0.25rem 0; }
 
+.project-link {
+  color: #e6edf3;
+  text-decoration-color: #e6edf3;
+}
+
 .mt-1 { margin-top: 1rem; }
 .mt-half { margin-top: 0.5rem; }
 .mt-2 { margin-top: 2rem; }
